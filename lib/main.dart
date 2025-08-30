@@ -1,10 +1,10 @@
+import 'package:firebase_app/catagories/add.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'auth/login.dart';
 import 'auth/signup.dart';
 import 'home.dart';
-
 
 
 void main() async {
@@ -32,14 +32,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
         
-    ThemeData Theming = ThemeData(colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple));
+    ThemeData Theming = ThemeData(colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),appBarTheme: AppBarTheme(backgroundColor: Colors.orange,titleTextStyle: TextStyle(fontSize: 25,fontWeight: FontWeight.w700,color: Colors.white),iconTheme: IconThemeData(color: Colors.white,size: 35),));
     Map <String, Widget Function(BuildContext)> routes = {
     "login":(context) => Login(),
     "signup":(context) => Signup(),
-    "home":(context) => Home()
+    "home":(context) => Home(),
+    "add":(context) => Add(),   
 
-    
-    
     };
     return MaterialApp(title: 'Flutter Demo',theme: Theming,home: FirebaseAuth.instance.currentUser == null? Login():Home(),routes: routes,);
   }

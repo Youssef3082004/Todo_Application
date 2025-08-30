@@ -58,10 +58,10 @@ class _Signup extends State<Signup>{
 
 
   void signup() async{
-
+      final navigator = Navigator.of(context);
     try {
       final credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email_var.text,password: password_var.text,);
-      Navigator.of(context).pushReplacementNamed("home");
+      navigator.pushReplacementNamed("home");
     } 
 
     on FirebaseAuthException catch (e) {

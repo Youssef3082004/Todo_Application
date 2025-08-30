@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import "package:firebase_app/componant/textformfeild.dart";
+import 'auth.dart';
 
 
 class Login extends StatefulWidget{
@@ -67,27 +68,24 @@ class _Login extends State<Login>{
     
 
   void signin () async {
+    final navigator = Navigator.of(context); 
     try {
       final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(email: email_var.text,password: password_var.text);
-      Navigator.of(context).pushReplacementNamed("home");
+      navigator.pushReplacementNamed("home");
     } 
     on FirebaseAuthException catch (e) {
         print('${e.hashCode}');
-
-      if (e.hashCode == 'invalid-credential') {
+      if (e.code == 'invalid-credential') {
         appear_dialog(context);
-
         print('No user found for that email.');
-        
       }
      else if (e.code == 'wrong-password') {
-    print('Wrong password provided for that user.');
+        print('Wrong password provided for that user.');
       }
     } 
   }
 
   void appear_dialog(BuildContext context) => showDialog(barrierDismissible: false,context: context, builder: (context){
-  
     return AlertDialog(
       title: Text("Error"),
       content: Text("Hello in Flutter Corse"),
