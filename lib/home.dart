@@ -1,7 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_app/catagories/update.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
+import 'package:awesome_dialog/awesome_dialog.dart';
 
 class Home extends StatefulWidget{
   const Home({super.key});
@@ -17,11 +18,12 @@ class _Home extends State<Home>{
   TextEditingController password_var = TextEditingController() ;
 
   List catagories = [];
+  bool isloading = true;
 
   @override
   void initState() {
     get_data();
-    setState(() {});
+    // setState(() {isloading = false;});
     super.initState();
   }
 
@@ -35,11 +37,17 @@ class _Home extends State<Home>{
     GridView catagories_grid = GridView.builder(gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),itemCount: catagories.length,itemBuilder: (context, index) => Item_builder(index: index));
     
 
+    //! =========================================================  Loading Controls =================================================
+    Column loading = Column(children: [CircularProgressIndicator(color: Colors.orange,),Text("Loading.....")],crossAxisAlignment: CrossAxisAlignment.center,mainAxisAlignment: MainAxisAlignment.center,spacing: 10,);
+
+    //! =========================================================  Loading Controls =================================================
     
+    AwesomeDialog(context: context,dialogType: DialogType.info,animType: AnimType.rightSlide,
+            title: 'Dialog Title',desc: 'Dialog description here.............',btnCancelOnPress: () {},btnOkOnPress: () {});
     //! =========================================================  Application controls =================================================
     FloatingActionButton add_button = FloatingActionButton(onPressed: ()=> Navigator.of(context).pushNamed("add"),child: Icon(Icons.add,color:Colors.white),backgroundColor: Colors.orange,);
     // ListView controls = ListView(children: [catagories_grid]); 
-    Container main_app = Container(color: Colors.white,child: catagories_grid,padding: EdgeInsets.all(15));
+    Container main_app = Container(color: Colors.white,child:isloading == true? Center(child: loading):catagories_grid,padding: EdgeInsets.all(15));
     return Scaffold(body: main_app,appBar: appbar,floatingActionButton: add_button,);
   }
 
@@ -50,27 +58,36 @@ class _Home extends State<Home>{
 
   MaterialButton sigin2(String path) => MaterialButton(child:Image.asset(path,fit: BoxFit.contain,width: 40,height: 40,) ,height: 70,color: Colors.grey.shade200,onPressed: (){},shape:RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),);
 
-  void logout() async{
 
+  void logout() async{
    await FirebaseAuth.instance.signOut();
     Navigator.of(context).pushNamedAndRemoveUntil("login", (route) => false);
-
   }
 
 
   void get_data() async{
-    QuerySnapshot data_query = await FirebaseFirestore.instance.collection("users").get();
+    QuerySnapshot data_query = await FirebaseFirestore.instance.collection("users").where("id",isEqualTo: FirebaseAuth.instance.currentUser!.uid).get();
+    // QuerySnapshot data_query = await FirebaseFirestore.instance.collection("users").doc().delete() //? For delete element
+
+    await Future.delayed(Duration(seconds: 0));
     catagories.addAll(data_query.docs);
-    setState(() {});
+    setState(() {isloading = false;});
   }
 
 
-  Card Item_builder({required int index}){
+  InkWell Item_builder({required int index}){
+
+    AwesomeDialog alert =  AwesomeDialog(context: context,dialogType: DialogType.warning,animType: AnimType.rightSlide,btnOkText: "Delete",btnCancelText: "Update",
+            title: 'Warning',desc: 'Are You sure to delete this Catagory?',btnCancelOnPress: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => update(Docid: catagories[index].id, Docname: catagories[index]["catagory"].toString())))
+            ,btnOkOnPress: () {
+              FirebaseFirestore.instance.collection("users").doc(catagories[index].id).delete();
+              Navigator.of(context).pushReplacementNamed("home");}
+);
     
     Text Catagory_name = Text("${catagories[index]["catagory"].toLowerCase()}",style: TextStyle(color: Colors.black,fontSize: 25,fontWeight: FontWeight.w700));
     Image folder = Image.asset("images/folder.png",width: 80,height: 80,fit: BoxFit.fill,);
     Column Controls = Column(children: [folder,Catagory_name],crossAxisAlignment: CrossAxisAlignment.center,mainAxisAlignment: MainAxisAlignment.center,);
-    return Card(child: Container(child:Controls ,height: 50,width: 50));
+    return InkWell(child: Card(child: Container(child:Controls ,height: 50,width: 50)),onLongPress: () => alert.show());
 
   }
 
