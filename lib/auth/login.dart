@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import "package:firebase_app/componant/textformfeild.dart";
-import 'auth.dart';
 
 
 class Login extends StatefulWidget{
