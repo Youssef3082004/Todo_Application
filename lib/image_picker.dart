@@ -50,9 +50,6 @@ class _picker extends State<picker>{
       fileimage = File(photo.path);
     }
     setState(() {});
-
-
-    
   }
 
 }

@@ -7,6 +7,7 @@ import 'image_picker.dart';
 import 'auth/login.dart';
 import 'auth/signup.dart';
 import 'home.dart';
+import 'Notification.dart';
 
 
 void main() async {
@@ -42,6 +43,6 @@ class MyApp extends StatelessWidget {
     "add":(context) => Add(),   
 
     };
-    return MaterialApp(title: 'Flutter Demo',theme: Theming,home: FirebaseAuth.instance.currentUser == null? Login():picker(),routes: routes,);
+    return MaterialApp(title: 'Flutter Demo',theme: Theming,home: FirebaseAuth.instance.currentUser == null? Login():Notification_test(),routes: routes,);
   }
 }
